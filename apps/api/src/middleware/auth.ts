@@ -20,7 +20,7 @@ export function validateSessionToken(token: string): AuthContext {
 			username: decoded.username,
 			role: decoded.role,
 		};
-	} catch (error) {
+	} catch (_error) {
 		throw new Error("Invalid or expired session token");
 	}
 }
@@ -70,5 +70,3 @@ export function requireSuperAdmin(context: AuthContext): void {
 		throw new Error("Super admin access required");
 	}
 }
-
-export { JWT_SECRET };

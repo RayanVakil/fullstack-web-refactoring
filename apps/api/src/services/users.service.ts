@@ -1,4 +1,4 @@
-import { sql, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 
 const { users } = schema;
@@ -21,11 +21,19 @@ export async function getUser(username: string, requesterId?: string) {
 			bio: users.bio,
 			role: users.role,
 			createdAt: users.createdAt,
-			followerCount: sql<number>`(SELECT count(*) FROM follows WHERE following_id = ${users.id})`.mapWith(Number),
-			followingCount: sql<number>`(SELECT count(*) FROM follows WHERE follower_id = ${users.id})`.mapWith(Number),
-			postCount: sql<number>`(SELECT count(*) FROM posts WHERE author_id = ${users.id})`.mapWith(Number),
+			followerCount:
+				sql<number>`(SELECT count(*) FROM follows WHERE following_id = ${users.id})`.mapWith(
+					Number,
+				),
+			followingCount:
+				sql<number>`(SELECT count(*) FROM follows WHERE follower_id = ${users.id})`.mapWith(Number),
+			postCount: sql<number>`(SELECT count(*) FROM posts WHERE author_id = ${users.id})`.mapWith(
+				Number,
+			),
 			isFollowing: requesterId
-				? sql<boolean>`EXISTS (SELECT 1 FROM follows WHERE follower_id = ${requesterId} AND following_id = ${users.id})`.mapWith(Boolean)
+				? sql<boolean>`EXISTS (SELECT 1 FROM follows WHERE follower_id = ${requesterId} AND following_id = ${users.id})`.mapWith(
+						Boolean,
+					)
 				: sql<boolean>`0`.mapWith(Boolean),
 		})
 		.from(users)

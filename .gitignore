@@ -47,3 +47,8 @@ packages/proto/generated/*
 count.txt
 todos.json
 *.log
+
+# LLM Audit artifacts
+AUDIT.md
+CLAUDE.md
+GEMINI.md

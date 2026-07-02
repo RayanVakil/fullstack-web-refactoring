@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-	createPost,
-	loginAs,
-	TEST_USERS,
-	uniqueId,
-	waitForHydration,
-} from "./fixtures/test-helpers";
+import { createPost, loginAs, uniqueId, waitForHydration } from "./fixtures/test-helpers";
 
 test.describe("Notifications - Comprehensive", () => {
 	test.describe("Notification Bell", () => {
@@ -369,7 +363,7 @@ test.describe("Notifications - Comprehensive", () => {
 			await loginAs(page, "alice");
 
 			// Check initial unread count if badge is visible
-			const badge = page.locator('a[title="Notifications"] span').filter({ hasText: /^\d+$/ });
+			const _badge = page.locator('a[title="Notifications"] span').filter({ hasText: /^\d+$/ });
 
 			// Go to notifications and mark all as read
 			await page.goto("/notifications", { waitUntil: "networkidle" });

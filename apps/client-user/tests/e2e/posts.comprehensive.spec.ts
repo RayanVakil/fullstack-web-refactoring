@@ -242,14 +242,14 @@ test.describe("Posts - Comprehensive", () => {
 			// Find the like button on our new post
 			const postArticle = page.locator("article").filter({ hasText: content }).first();
 			const likeButton = postArticle.locator("button").filter({ hasText: /^\d+$/ }).first();
-			const initialCount = Number.parseInt((await likeButton.textContent()) || "0");
+			const initialCount = Number.parseInt((await likeButton.textContent()) || "0", 10);
 
 			await likeButton.click();
 			await waitForHydration(page);
 
 			// Like count should increase or button state should change (retrying assertion)
 			await expect
-				.poll(async () => Number.parseInt((await likeButton.textContent()) || "0"))
+				.poll(async () => Number.parseInt((await likeButton.textContent()) || "0", 10))
 				.toBeGreaterThanOrEqual(initialCount);
 		});
 
@@ -265,14 +265,14 @@ test.describe("Posts - Comprehensive", () => {
 			// Click twice to like then unlike
 			await likeButton.click();
 			await waitForHydration(page);
-			const likedCount = Number.parseInt((await likeButton.textContent()) || "0");
+			const likedCount = Number.parseInt((await likeButton.textContent()) || "0", 10);
 
 			await likeButton.click();
 			await waitForHydration(page);
 
 			// Unlike count should be <= liked count (retrying assertion)
 			await expect
-				.poll(async () => Number.parseInt((await likeButton.textContent()) || "0"))
+				.poll(async () => Number.parseInt((await likeButton.textContent()) || "0", 10))
 				.toBeLessThanOrEqual(likedCount);
 		});
 
@@ -289,7 +289,7 @@ test.describe("Posts - Comprehensive", () => {
 
 			// Wait for like count to update before capturing
 			await expect
-				.poll(async () => Number.parseInt((await likeButton.textContent()) || "0"))
+				.poll(async () => Number.parseInt((await likeButton.textContent()) || "0", 10))
 				.toBeGreaterThan(0);
 			const countAfterLike = await likeButton.textContent();
 

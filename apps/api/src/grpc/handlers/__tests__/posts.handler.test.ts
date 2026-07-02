@@ -63,10 +63,12 @@ describe("PostsHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(postsHandler.createPost({
-				sessionToken: "invalid-token",
-				content: "Hello world!",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				postsHandler.createPost({
+					sessionToken: "invalid-token",
+					content: "Hello world!",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 
 		it("returns error when content exceeds limit", async () => {
@@ -78,10 +80,12 @@ describe("PostsHandler", () => {
 
 			vi.mocked(createPost).mockRejectedValue(new Error("Post content exceeds 280 characters"));
 
-			await expect(postsHandler.createPost({
-				sessionToken: "valid-token",
-				content: "a".repeat(300),
-			})).rejects.toThrow("Post content exceeds 280 characters");
+			await expect(
+				postsHandler.createPost({
+					sessionToken: "valid-token",
+					content: "a".repeat(300),
+				}),
+			).rejects.toThrow("Post content exceeds 280 characters");
 		});
 	});
 
@@ -180,11 +184,13 @@ describe("PostsHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(postsHandler.updatePost({
-				sessionToken: "invalid-token",
-				postId: "post-456",
-				content: "Updated content",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				postsHandler.updatePost({
+					sessionToken: "invalid-token",
+					postId: "post-456",
+					content: "Updated content",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 
 		it("returns error when edit window has passed", async () => {
@@ -196,11 +202,13 @@ describe("PostsHandler", () => {
 
 			vi.mocked(updatePost).mockRejectedValue(new Error("Edit window has passed"));
 
-			await expect(postsHandler.updatePost({
-				sessionToken: "valid-token",
-				postId: "post-456",
-				content: "Updated content",
-			})).rejects.toThrow("Edit window has passed");
+			await expect(
+				postsHandler.updatePost({
+					sessionToken: "valid-token",
+					postId: "post-456",
+					content: "Updated content",
+				}),
+			).rejects.toThrow("Edit window has passed");
 		});
 
 		it("returns error when user is not the author", async () => {
@@ -212,11 +220,13 @@ describe("PostsHandler", () => {
 
 			vi.mocked(updatePost).mockRejectedValue(new Error("You can only edit your own posts"));
 
-			await expect(postsHandler.updatePost({
-				sessionToken: "valid-token",
-				postId: "post-456",
-				content: "Updated content",
-			})).rejects.toThrow("You can only edit your own posts");
+			await expect(
+				postsHandler.updatePost({
+					sessionToken: "valid-token",
+					postId: "post-456",
+					content: "Updated content",
+				}),
+			).rejects.toThrow("You can only edit your own posts");
 		});
 	});
 
@@ -244,10 +254,12 @@ describe("PostsHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(postsHandler.deletePost({
-				sessionToken: "invalid-token",
-				postId: "post-456",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				postsHandler.deletePost({
+					sessionToken: "invalid-token",
+					postId: "post-456",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 
 		it("returns error when user is not the author", async () => {
@@ -259,10 +271,12 @@ describe("PostsHandler", () => {
 
 			vi.mocked(deletePost).mockRejectedValue(new Error("You can only delete your own posts"));
 
-			await expect(postsHandler.deletePost({
-				sessionToken: "valid-token",
-				postId: "post-456",
-			})).rejects.toThrow("You can only delete your own posts");
+			await expect(
+				postsHandler.deletePost({
+					sessionToken: "valid-token",
+					postId: "post-456",
+				}),
+			).rejects.toThrow("You can only delete your own posts");
 		});
 	});
 

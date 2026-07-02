@@ -53,23 +53,27 @@ describe("AuthHandler", () => {
 		it("returns error on registration failure", async () => {
 			vi.mocked(registerUser).mockRejectedValue(new Error("Email already exists"));
 
-			await expect(authHandler.register({
-				email: "test@example.com",
-				username: "testuser",
-				displayName: "Test User",
-				password: "password123",
-			})).rejects.toThrow("Email already exists");
+			await expect(
+				authHandler.register({
+					email: "test@example.com",
+					username: "testuser",
+					displayName: "Test User",
+					password: "password123",
+				}),
+			).rejects.toThrow("Email already exists");
 		});
 
 		it("handles non-Error exceptions", async () => {
 			vi.mocked(registerUser).mockRejectedValue("Unknown error");
 
-			await expect(authHandler.register({
-				email: "test@example.com",
-				username: "testuser",
-				displayName: "Test User",
-				password: "password123",
-			})).rejects.toThrow("Unknown error");
+			await expect(
+				authHandler.register({
+					email: "test@example.com",
+					username: "testuser",
+					displayName: "Test User",
+					password: "password123",
+				}),
+			).rejects.toThrow("Unknown error");
 		});
 	});
 
@@ -97,19 +101,23 @@ describe("AuthHandler", () => {
 		it("returns error on invalid credentials", async () => {
 			vi.mocked(loginUser).mockRejectedValue(new Error("Invalid credentials"));
 
-			await expect(authHandler.login({
-				email: "test@example.com",
-				password: "wrongpassword",
-			})).rejects.toThrow("Invalid credentials");
+			await expect(
+				authHandler.login({
+					email: "test@example.com",
+					password: "wrongpassword",
+				}),
+			).rejects.toThrow("Invalid credentials");
 		});
 
 		it("handles non-Error exceptions", async () => {
 			vi.mocked(loginUser).mockRejectedValue("Unknown error");
 
-			await expect(authHandler.login({
-				email: "test@example.com",
-				password: "password123",
-			})).rejects.toThrow("Unknown error");
+			await expect(
+				authHandler.login({
+					email: "test@example.com",
+					password: "password123",
+				}),
+			).rejects.toThrow("Unknown error");
 		});
 	});
 

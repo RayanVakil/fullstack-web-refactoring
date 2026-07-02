@@ -81,11 +81,13 @@ describe("CommentsHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(commentsHandler.createComment({
-				sessionToken: "invalid-token",
-				postId: "post-123",
-				content: "Test comment",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				commentsHandler.createComment({
+					sessionToken: "invalid-token",
+					postId: "post-123",
+					content: "Test comment",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 
 		it("returns error when post not found", async () => {
@@ -97,11 +99,13 @@ describe("CommentsHandler", () => {
 
 			vi.mocked(createComment).mockRejectedValue(new Error("Post not found"));
 
-			await expect(commentsHandler.createComment({
-				sessionToken: "valid-token",
-				postId: "non-existent",
-				content: "Great post!",
-			})).rejects.toThrow("Post not found");
+			await expect(
+				commentsHandler.createComment({
+					sessionToken: "valid-token",
+					postId: "non-existent",
+					content: "Great post!",
+				}),
+			).rejects.toThrow("Post not found");
 		});
 	});
 
@@ -214,10 +218,12 @@ describe("CommentsHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(commentsHandler.deleteComment({
-				sessionToken: "invalid-token",
-				commentId: "comment-456",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				commentsHandler.deleteComment({
+					sessionToken: "invalid-token",
+					commentId: "comment-456",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 
 		it("returns error when user is not the author", async () => {
@@ -231,10 +237,12 @@ describe("CommentsHandler", () => {
 				new Error("You can only delete your own comments"),
 			);
 
-			await expect(commentsHandler.deleteComment({
-				sessionToken: "valid-token",
-				commentId: "comment-456",
-			})).rejects.toThrow("You can only delete your own comments");
+			await expect(
+				commentsHandler.deleteComment({
+					sessionToken: "valid-token",
+					commentId: "comment-456",
+				}),
+			).rejects.toThrow("You can only delete your own comments");
 		});
 	});
 });

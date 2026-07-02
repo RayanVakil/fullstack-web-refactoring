@@ -152,21 +152,25 @@ describe("AdminHandler", () => {
 			mockAdminAuth();
 			vi.mocked(banUser).mockRejectedValue(new Error("Cannot ban admin users"));
 
-			await expect(adminHandler.banUser({
-				sessionToken: "admin-token",
-				userId: "admin-456",
-				reason: "Test",
-			})).rejects.toThrow("Cannot ban admin users");
+			await expect(
+				adminHandler.banUser({
+					sessionToken: "admin-token",
+					userId: "admin-456",
+					reason: "Test",
+				}),
+			).rejects.toThrow("Cannot ban admin users");
 		});
 
 		it("returns error for non-admin users", async () => {
 			mockUserAuth();
 
-			await expect(adminHandler.banUser({
-				sessionToken: "user-token",
-				userId: "user-456",
-				reason: "Test",
-			})).rejects.toThrow("Admin access required");
+			await expect(
+				adminHandler.banUser({
+					sessionToken: "user-token",
+					userId: "user-456",
+					reason: "Test",
+				}),
+			).rejects.toThrow("Admin access required");
 		});
 	});
 
@@ -188,10 +192,12 @@ describe("AdminHandler", () => {
 			mockAdminAuth();
 			vi.mocked(unbanUser).mockRejectedValue(new Error("User is not banned"));
 
-			await expect(adminHandler.unbanUser({
-				sessionToken: "admin-token",
-				userId: "user-456",
-			})).rejects.toThrow("User is not banned");
+			await expect(
+				adminHandler.unbanUser({
+					sessionToken: "admin-token",
+					userId: "user-456",
+				}),
+			).rejects.toThrow("User is not banned");
 		});
 	});
 
@@ -214,11 +220,13 @@ describe("AdminHandler", () => {
 			mockAdminAuth();
 			vi.mocked(updateUserRole).mockRejectedValue(new Error("Invalid role"));
 
-			await expect(adminHandler.updateUserRole({
-				sessionToken: "admin-token",
-				userId: "user-456",
-				role: "invalid",
-			})).rejects.toThrow("Invalid role");
+			await expect(
+				adminHandler.updateUserRole({
+					sessionToken: "admin-token",
+					userId: "user-456",
+					role: "invalid",
+				}),
+			).rejects.toThrow("Invalid role");
 		});
 	});
 
@@ -240,10 +248,12 @@ describe("AdminHandler", () => {
 			mockAdminAuth();
 			vi.mocked(deleteUser).mockRejectedValue(new Error("Cannot delete admin"));
 
-			await expect(adminHandler.deleteUser({
-				sessionToken: "admin-token",
-				userId: "admin-456",
-			})).rejects.toThrow("Cannot delete admin");
+			await expect(
+				adminHandler.deleteUser({
+					sessionToken: "admin-token",
+					userId: "admin-456",
+				}),
+			).rejects.toThrow("Cannot delete admin");
 		});
 	});
 

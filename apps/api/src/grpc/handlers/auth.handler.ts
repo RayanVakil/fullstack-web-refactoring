@@ -38,23 +38,19 @@ export const authHandler: IAuthService = {
 	},
 
 	async getCurrentUser(request) {
-		try {
-			const auth = validateSessionToken(request.sessionToken);
-			const user = await getCurrentUser(auth.userId);
+		const auth = validateSessionToken(request.sessionToken);
+		const user = await getCurrentUser(auth.userId);
 
-			return {
-				id: user.id,
-				email: user.email,
-				username: user.username,
-				displayName: user.displayName,
-				avatarUrl: user.avatarUrl || undefined,
-				bio: user.bio || undefined,
-				role: user.role,
-				createdAt: toProtoTimestamp(user.createdAt),
-			};
-		} catch (error) {
-			throw new Error(error instanceof Error ? error.message : "Failed to get user");
-		}
+		return {
+			id: user.id,
+			email: user.email,
+			username: user.username,
+			displayName: user.displayName,
+			avatarUrl: user.avatarUrl || undefined,
+			bio: user.bio || undefined,
+			role: user.role,
+			createdAt: toProtoTimestamp(user.createdAt),
+		};
 	},
 
 	async validateSession(request) {

@@ -111,7 +111,7 @@ function BookmarksPage() {
 
 	useEffect(() => {
 		loadData();
-	}, []);
+	}, [loadData]);
 
 	const loadData = async () => {
 		try {

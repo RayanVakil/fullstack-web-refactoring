@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createTestUser } from "../../tests/helpers";
 import { db, schema } from "../db";
 import { getCurrentUser, loginUser, registerUser } from "./auth.service";
+import crypto from "node:crypto";
 
 const { users } = schema;
 
@@ -56,6 +57,45 @@ describe("AuthService", () => {
 	});
 
 	describe("loginUser", () => {
+		it("authenticates legacy SHA-256 users and migrates hash to bcrypt", async () => {
+			// Manually create a user with the legacy SHA-256 hash logic
+			const password = "legacy_password";
+			const salt = "salt";
+			const legacyHash = crypto
+				.createHash("sha256")
+				.update(password + salt)
+				.digest("hex");
+
+			const legacyUser = {
+				id: "user-legacy-hash-123",
+				email: "legacy@example.com",
+				username: "legacy_user",
+				displayName: "Legacy User",
+				passwordHash: legacyHash,
+				role: "user" as const,
+			};
+
+			await db.insert(users).values(legacyUser);
+
+			// First, verify the DB has the legacy hash
+			const beforeDbUser = await db.select().from(users).where(eq(users.id, legacyUser.id)).get();
+			expect(beforeDbUser?.passwordHash).toBe(legacyHash);
+			expect(beforeDbUser?.passwordHash?.startsWith("$2")).toBe(false);
+
+			// Login should succeed for the legacy password
+			const result = await loginUser({
+				email: "legacy@example.com",
+				password: password,
+			});
+
+			expect(result.userId).toBeDefined();
+			expect(result.sessionToken).toBeDefined();
+
+			// Verify the database hash was migrated to bcrypt
+			const migratedDbUser = await db.select().from(users).where(eq(users.id, legacyUser.id)).get();
+			expect(migratedDbUser?.passwordHash).not.toBe(legacyHash);
+			expect(migratedDbUser?.passwordHash?.startsWith("$2")).toBe(true);
+		});
 		it("logs in with valid credentials", async () => {
 			await createTestUser({
 				email: "login@example.com",

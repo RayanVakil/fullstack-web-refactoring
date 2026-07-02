@@ -74,10 +74,12 @@ describe("LikesHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(likesHandler.togglePostLike({
-				sessionToken: "invalid-token",
-				postId: "post-456",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				likesHandler.togglePostLike({
+					sessionToken: "invalid-token",
+					postId: "post-456",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 
 		it("returns error when post not found", async () => {
@@ -89,10 +91,12 @@ describe("LikesHandler", () => {
 
 			vi.mocked(togglePostLike).mockRejectedValue(new Error("Post not found"));
 
-			await expect(likesHandler.togglePostLike({
-				sessionToken: "valid-token",
-				postId: "non-existent",
-			})).rejects.toThrow("Post not found");
+			await expect(
+				likesHandler.togglePostLike({
+					sessionToken: "valid-token",
+					postId: "non-existent",
+				}),
+			).rejects.toThrow("Post not found");
 		});
 	});
 
@@ -139,10 +143,12 @@ describe("LikesHandler", () => {
 				throw new Error("Invalid or expired session token");
 			});
 
-			await expect(likesHandler.toggleCommentLike({
-				sessionToken: "invalid-token",
-				commentId: "comment-456",
-			})).rejects.toThrow("Invalid or expired session token");
+			await expect(
+				likesHandler.toggleCommentLike({
+					sessionToken: "invalid-token",
+					commentId: "comment-456",
+				}),
+			).rejects.toThrow("Invalid or expired session token");
 		});
 	});
 

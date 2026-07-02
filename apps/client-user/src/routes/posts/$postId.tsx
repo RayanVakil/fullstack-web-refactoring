@@ -22,7 +22,7 @@ function PostPage() {
 
 	useEffect(() => {
 		loadData();
-	}, [postId]);
+	}, [loadData]);
 
 	const loadData = async () => {
 		try {

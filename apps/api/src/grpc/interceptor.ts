@@ -1,5 +1,5 @@
+import { randomUUID } from "node:crypto";
 import { RpcError } from "@protobuf-ts/runtime-rpc";
-import { randomUUID } from "crypto";
 
 export class AppError extends Error {
 	constructor(
@@ -21,21 +21,44 @@ export function withLogging<T extends Record<string, any>>(serviceName: string, 
 				const startTime = Date.now();
 
 				try {
-					console.log(`[${traceId}] [${serviceName}.${key}] Request received`);
+					console.log(
+						JSON.stringify({ traceId, service: serviceName, method: key, status: "STARTED" }),
+					);
 					const result = await method(request, context);
 					const duration = Date.now() - startTime;
-					console.log(`[${traceId}] [${serviceName}.${key}] Completed in ${duration}ms`);
+
+					// Add trace ID to response metadata so clients can correlate
+					if (context && typeof context.responseTrailers === "object") {
+						context.responseTrailers.traceId = traceId;
+					}
+
+					console.log(
+						JSON.stringify({ traceId, service: serviceName, method: key, duration, status: "OK" }),
+					);
 					return result;
 				} catch (error) {
 					const duration = Date.now() - startTime;
-					console.error(`[${traceId}] [${serviceName}.${key}] Failed in ${duration}ms`, error);
+					console.error(
+						JSON.stringify({
+							traceId,
+							service: serviceName,
+							method: key,
+							duration,
+							status: "ERROR",
+							error: error instanceof Error ? error.message : "Unknown",
+						}),
+					);
 
 					if (error instanceof AppError) {
 						throw new RpcError(error.message, error.code);
 					}
 
 					if (error instanceof Error) {
-						if (error.message.includes("Token expired") || error.message.includes("Invalid token") || error.message.includes("No session")) {
+						if (
+							error.message.includes("Token expired") ||
+							error.message.includes("Invalid token") ||
+							error.message.includes("No session")
+						) {
 							throw new RpcError(error.message, "UNAUTHENTICATED");
 						}
 						if (error.message.includes("not found")) {

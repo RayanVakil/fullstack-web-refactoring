@@ -35,8 +35,11 @@ export async function listUsers(options: ListUsersOptions = {}) {
 			updatedAt: users.updatedAt,
 			bannedAt: users.bannedAt,
 			bannedReason: users.bannedReason,
-			postCount: sql<number>`(SELECT count(*) FROM posts WHERE author_id = ${users.id})`.mapWith(Number),
-			commentCount: sql<number>`(SELECT count(*) FROM comments WHERE author_id = ${users.id})`.mapWith(Number),
+			postCount: sql<number>`(SELECT count(*) FROM posts WHERE author_id = ${users.id})`.mapWith(
+				Number,
+			),
+			commentCount:
+				sql<number>`(SELECT count(*) FROM comments WHERE author_id = ${users.id})`.mapWith(Number),
 		})
 		.from(users)
 		.$dynamic();
@@ -68,7 +71,8 @@ export async function listUsers(options: ListUsersOptions = {}) {
 }
 
 export async function getUserDetails(userId: string) {
-	const user = await db.select({
+	const user = await db
+		.select({
 			id: users.id,
 			email: users.email,
 			username: users.username,
@@ -81,9 +85,15 @@ export async function getUserDetails(userId: string) {
 			bannedAt: users.bannedAt,
 			bannedReason: users.bannedReason,
 			bannedBy: users.bannedBy,
-			postCount: sql<number>`(SELECT count(*) FROM posts WHERE author_id = ${users.id})`.mapWith(Number),
-			commentCount: sql<number>`(SELECT count(*) FROM comments WHERE author_id = ${users.id})`.mapWith(Number),
-		}).from(users).where(eq(users.id, userId)).get();
+			postCount: sql<number>`(SELECT count(*) FROM posts WHERE author_id = ${users.id})`.mapWith(
+				Number,
+			),
+			commentCount:
+				sql<number>`(SELECT count(*) FROM comments WHERE author_id = ${users.id})`.mapWith(Number),
+		})
+		.from(users)
+		.where(eq(users.id, userId))
+		.get();
 
 	if (!user) {
 		throw new Error("User not found");

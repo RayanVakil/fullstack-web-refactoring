@@ -1,4 +1,4 @@
-import { sql, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 import { processMentions } from "./mentions.service";
 import { createNotification } from "./notifications.service";
@@ -25,9 +25,13 @@ export function buildCommentSelect(currentUserId?: string) {
 			displayName: users.displayName,
 			avatarUrl: users.avatarUrl,
 		},
-		likeCount: sql<number>`(SELECT count(*) FROM likes WHERE comment_id = ${comments.id})`.mapWith(Number),
+		likeCount: sql<number>`(SELECT count(*) FROM likes WHERE comment_id = ${comments.id})`.mapWith(
+			Number,
+		),
 		isLiked: currentUserId
-			? sql<boolean>`EXISTS (SELECT 1 FROM likes WHERE comment_id = ${comments.id} AND user_id = ${currentUserId})`.mapWith(Boolean)
+			? sql<boolean>`EXISTS (SELECT 1 FROM likes WHERE comment_id = ${comments.id} AND user_id = ${currentUserId})`.mapWith(
+					Boolean,
+				)
 			: sql<boolean>`0`.mapWith(Boolean),
 	};
 }
@@ -97,7 +101,7 @@ export async function getPostComments(postId: string, userId?: string) {
 	const topLevelComments = allComments.filter((c) => !c.parentId);
 	const replies = allComments.filter((c) => c.parentId);
 
-	type CommentType = typeof allComments[0];
+	type CommentType = (typeof allComments)[0];
 	type CommentWithReplies = CommentType & { replies: CommentWithReplies[] };
 
 	const replyMap = new Map<string, CommentWithReplies[]>();
@@ -106,13 +110,15 @@ export async function getPostComments(postId: string, userId?: string) {
 		if (!replyMap.has(reply.parentId)) {
 			replyMap.set(reply.parentId, []);
 		}
-		replyMap.get(reply.parentId)!.push({ ...reply, replies: [] });
+		replyMap.get(reply.parentId)?.push({ ...reply, replies: [] });
 	}
 
-	return topLevelComments.map((comment): CommentWithReplies => ({
-		...comment,
-		replies: replyMap.get(comment.id) || [],
-	}));
+	return topLevelComments.map(
+		(comment): CommentWithReplies => ({
+			...comment,
+			replies: replyMap.get(comment.id) || [],
+		}),
+	);
 }
 
 export async function deleteComment(commentId: string, userId: string) {

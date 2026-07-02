@@ -15,23 +15,23 @@ export const usersHandler: IUsersService = {
 			}
 		}
 
-	const user = await getUser(request.username, userId);
+		const user = await getUser(request.username, userId);
 
-	return {
-		id: user.id,
-		email: user.email,
-		username: user.username,
-		displayName: user.displayName,
-		avatarUrl: user.avatarUrl || undefined,
-		bio: user.bio || undefined,
-		role: user.role,
-		createdAt: toProtoTimestamp(user.createdAt),
-		followerCount: user.followerCount,
-		followingCount: user.followingCount,
-		postCount: user.postCount,
-		isFollowing: user.isFollowing,
-	};
-},
+		return {
+			id: user.id,
+			email: user.email,
+			username: user.username,
+			displayName: user.displayName,
+			avatarUrl: user.avatarUrl || undefined,
+			bio: user.bio || undefined,
+			role: user.role,
+			createdAt: toProtoTimestamp(user.createdAt),
+			followerCount: user.followerCount,
+			followingCount: user.followingCount,
+			postCount: user.postCount,
+			isFollowing: user.isFollowing,
+		};
+	},
 
 	async updateProfile(request) {
 		const auth = validateSessionToken(request.sessionToken);

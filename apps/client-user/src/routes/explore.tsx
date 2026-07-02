@@ -64,7 +64,7 @@ function ExplorePage() {
 
 	useEffect(() => {
 		loadData();
-	}, []);
+	}, [loadData]);
 
 	const loadData = async () => {
 		try {

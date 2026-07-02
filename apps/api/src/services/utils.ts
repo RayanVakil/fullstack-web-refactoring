@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 import * as bcrypt from "bcryptjs";
 
 /**
@@ -23,10 +23,10 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 	if (hashedPassword.startsWith("$2a$") || hashedPassword.startsWith("$2b$")) {
 		return bcrypt.compare(password, hashedPassword);
 	}
-	
+
 	// Fallback to legacy SHA-256
 	const hash = createHash("sha256");
-	hash.update(password + "salt");
+	hash.update(`${password}salt`);
 	const legacyHash = hash.digest("hex");
 	return legacyHash === hashedPassword;
 }

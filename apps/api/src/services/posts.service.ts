@@ -1,5 +1,6 @@
-import { sql, desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
+import { AppError } from "../grpc/interceptor";
 import { processMentions } from "./mentions.service";
 import { generateId } from "./utils";
 
@@ -34,10 +35,16 @@ export function buildPostSelect(currentUserId?: string) {
 			displayName: users.displayName,
 			avatarUrl: users.avatarUrl,
 		},
-		likeCount: sql<number>`(SELECT count(*) FROM likes WHERE post_id = ${posts.id})`.mapWith(Number),
-		commentCount: sql<number>`(SELECT count(*) FROM comments WHERE post_id = ${posts.id})`.mapWith(Number),
+		likeCount: sql<number>`(SELECT count(*) FROM likes WHERE post_id = ${posts.id})`.mapWith(
+			Number,
+		),
+		commentCount: sql<number>`(SELECT count(*) FROM comments WHERE post_id = ${posts.id})`.mapWith(
+			Number,
+		),
 		isLiked: currentUserId
-			? sql<boolean>`EXISTS (SELECT 1 FROM likes WHERE post_id = ${posts.id} AND user_id = ${currentUserId})`.mapWith(Boolean)
+			? sql<boolean>`EXISTS (SELECT 1 FROM likes WHERE post_id = ${posts.id} AND user_id = ${currentUserId})`.mapWith(
+					Boolean,
+				)
 			: sql<boolean>`0`.mapWith(Boolean),
 	};
 }
@@ -73,7 +80,7 @@ export async function getPost(postId: string, userId?: string) {
 		.get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	return post;
@@ -91,7 +98,7 @@ export async function updatePost(input: UpdatePostInput) {
 	const post = await db.select().from(posts).where(eq(posts.id, input.postId)).get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	if (post.authorId !== input.userId) {
@@ -120,7 +127,7 @@ export async function deletePost(postId: string, userId: string) {
 	const post = await db.select().from(posts).where(eq(posts.id, postId)).get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	if (post.authorId !== userId) {

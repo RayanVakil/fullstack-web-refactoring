@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "../db";
+import { AppError } from "../grpc/interceptor";
 import { type AuthContext, createSessionToken } from "../middleware/auth";
 import { generateId, hashPassword, verifyPassword } from "./utils";
 
@@ -22,7 +23,7 @@ export async function registerUser(input: RegisterInput) {
 	const existingEmail = await db.select().from(users).where(eq(users.email, input.email)).get();
 
 	if (existingEmail) {
-		throw new Error("User with this email already exists");
+		throw new AppError("INVALID_ARGUMENT", "User with this email already exists");
 	}
 
 	// Check if username already exists
@@ -33,7 +34,7 @@ export async function registerUser(input: RegisterInput) {
 		.get();
 
 	if (existingUsername) {
-		throw new Error("Username already taken");
+		throw new AppError("INVALID_ARGUMENT", "Username already taken");
 	}
 
 	// Hash password
@@ -65,18 +66,21 @@ export async function loginUser(input: LoginInput) {
 	const user = await db.select().from(users).where(eq(users.email, input.email)).get();
 
 	if (!user) {
-		throw new Error("Invalid email or password");
+		throw new AppError("UNAUTHENTICATED", "Invalid email or password");
 	}
 
 	// Check if user is banned
 	if (user.bannedAt) {
-		throw new Error(`Account banned: ${user.bannedReason || "No reason provided"}`);
+		throw new AppError(
+			"PERMISSION_DENIED",
+			`Account banned: ${user.bannedReason || "No reason provided"}`,
+		);
 	}
 
 	// Verify password
 	const valid = await verifyPassword(input.password, user.passwordHash);
 	if (!valid) {
-		throw new Error("Invalid email or password");
+		throw new AppError("UNAUTHENTICATED", "Invalid email or password");
 	}
 
 	// Transparently upgrade legacy SHA-256 hashes to bcrypt
@@ -112,7 +116,7 @@ export async function getCurrentUser(userId: string) {
 		.get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	return user;

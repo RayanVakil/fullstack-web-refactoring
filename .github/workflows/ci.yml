@@ -43,8 +43,14 @@ jobs:
       - name: Generate DB Client
         run: pnpm db:generate
         
+      - name: Lint
+        run: pnpm lint --filter="[HEAD^1]"
+
+      - name: Typecheck
+        run: pnpm typecheck --filter="[HEAD^1]"
+        
       - name: Build
-        run: pnpm build
+        run: pnpm build --filter="[HEAD^1]"
         
       - name: Test
         run: pnpm test

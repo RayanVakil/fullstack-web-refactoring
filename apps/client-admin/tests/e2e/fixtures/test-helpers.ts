@@ -176,7 +176,7 @@ export async function searchInList(page: Page, query: string): Promise<void> {
 export async function getStatValue(page: Page, label: string): Promise<number> {
 	const stat = page.getByText(label).locator("..").locator("p, span, div").first();
 	const text = await stat.textContent();
-	return Number.parseInt(text?.replace(/\D/g, "") || "0");
+	return Number.parseInt(text?.replace(/\D/g, "") || "0", 10);
 }
 
 /**

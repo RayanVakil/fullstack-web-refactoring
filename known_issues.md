@@ -60,6 +60,10 @@ This document outlines the core system vulnerabilities and architectural defects
 * **How it was fixed:** 
   - Rewrote the iterative `Promise.all` logic inside `feed.service.ts`, `posts.service.ts`, `bookmarks.service.ts`, etc., using Drizzle ORM's scalar subqueries via `.mapWith()`.
   - Replaced multi-stage data fetching with unified, efficient SQL statements to count likes/comments and resolve the `isLiked` status directly inside the single query.
+* **Query Profiling Before/After (N = 20):**
+  - **Home Feed:** 61 queries previously -> **1 query** now.
+  - **User Profile Posts:** 61 queries previously -> **1 query** now.
+  - **Bookmarks:** 61 queries previously -> **2 queries** now (1 for bookmarks metadata, 1 for fetching posts efficiently via `inArray`).
 
 ### 3. Error Handling & Observability (Reliability)
 * **What was fixed:** Individual API handlers were manually throwing generic strings inside `try/catch` blocks, causing loss of contextual error information, and failing to return native gRPC error codes. There was also no central logging.
@@ -72,8 +76,19 @@ This document outlines the core system vulnerabilities and architectural defects
 ### 4. Test Infrastructure & Coverage Gaps (Tooling)
 * **What was fixed:** NPM scripts for E2E tests were failing on Windows environments due to Bash-specific syntax (e.g., `&&`, `rm -rf`).
 * **How it was fixed:** 
-  - Swapped hardcoded bash cleanup commands with cross-platform equivalents like `rimraf`.
-  - Integrated `start-server-and-test` to securely and deterministically spin up the backend/frontend servers before kicking off the tests, ensuring zero port conflicts and full cross-platform support.
+  - Swapped hardcoded bash cleanup commands with cross-platform equivalents like `rimraf` and configured `test:e2e` for cross-platform support.
+  - Integrated `start-server-and-test` to securely and deterministically spin up the backend/frontend servers before kicking off the tests, ensuring zero port conflicts.
+* **Test Coverage Audit:**
+  | Component | Covered? | Gap Description |
+  |-----------|----------|-----------------|
+  | `auth.service.ts` | Yes | Includes vulnerability migration test. |
+  | `posts.service.ts` | Yes | CRUD & likes verified. |
+  | `comments.service.ts`| Yes | Nested resolutions verified. |
+  | `bookmarks.service`| Partial | Needs robust testing for sort orders. |
+  | `search.service.ts`| No | Missing unit tests for full-text search. |
+  | `users.service.ts` | No | Missing follow/unfollow unit tests. |
+  | `feed.service.ts`  | Partial | Needs service-level feed sorting tests. |
+  | E2E Auth / Feed    | Yes | Covered by Playwright tests. |
 
 ### 5. Build Pipeline & Developer Experience (Tooling)
 * **What was fixed:** Turborepo cache outputs were misaligned with the build directories, causing cache-miss warnings. No automated CI checks existed for pull requests.
