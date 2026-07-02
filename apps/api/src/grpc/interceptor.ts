@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { RpcError } from "@protobuf-ts/runtime-rpc";
 
+/**
+ * Custom application error used to propagate specific gRPC status codes.
+ * Throwing this inside a handler guarantees the interceptor will cleanly map it.
+ */
 export class AppError extends Error {
 	constructor(
 		public code: string,
@@ -11,6 +15,12 @@ export class AppError extends Error {
 	}
 }
 
+/**
+ * Centralized gRPC Interceptor wrapper.
+ * Traps thrown AppErrors to properly format RpcError responses, preventing data leakage.
+ * Automates Request/Response lifecycle logging utilizing structured JSON.
+ * Injects a unique `traceId` into response trailing metadata for client observability.
+ */
 export function withLogging<T extends Record<string, any>>(serviceName: string, handler: T): T {
 	const wrapped = {} as T;
 	for (const key of Object.keys(handler)) {

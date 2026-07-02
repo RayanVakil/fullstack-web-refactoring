@@ -83,10 +83,12 @@ export async function loginUser(input: LoginInput) {
 		throw new AppError("UNAUTHENTICATED", "Invalid email or password");
 	}
 
-	// Transparently upgrade legacy SHA-256 hashes to bcrypt
+	// Transparently upgrade legacy SHA-256 hashes to bcrypt on-the-fly.
+	// This ensures strict backward compatibility with older database records
+	// while incrementally hardening the database without requiring mass migration scripts.
 	if (!user.passwordHash.startsWith("$2a$") && !user.passwordHash.startsWith("$2b$")) {
 		const newHash = await hashPassword(input.password);
-		await db.update(users).set({ passwordHash: newHash }).where(eq(users.id, user.id));
+		await db.update(users).set({ passwordHash: newHash }).where(eq(users.id, user.id)).run();
 	}
 
 	// Create session token

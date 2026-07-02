@@ -54,6 +54,15 @@ After running the seed script:
 
 ## Features
 
+### Security & Architecture (2026 Refactoring)
+
+As part of a massive infrastructure hardening initiative, the codebase has been significantly optimized and secured:
+
+- **Credential Security:** Legacy plain SHA-256 hashes were replaced with strict `bcryptjs` encryption. A seamless on-the-fly migration strategy was injected into the login service to transparently upgrade legacy hashes to `bcrypt` without triggering database downtime. Client-side JWT generation was completely disabled and the `JWT_SECRET` removed, guaranteeing tokens are solely minted natively by the secure API.
+- **Query Performance (N+1 Resolved):** The iterative `Promise.all` logic inside service components (which fetched sub-relations like nested likes/comments independently for each post) was fully rewritten. Data access now leverages Drizzle ORM's scalar `.mapWith()` functions. This compresses multi-stage `O(N)` mapping operations into single-roundtrip, highly performant SQL queries.
+- **Centralized Error Handling:** All API gRPC endpoints were scrubbed of manual `try/catch` handlers. A unified `withLogging` gRPC interceptor natively traps all thrown `AppError` exceptions, maps them cleanly to standard RpcErrors, and outputs structured JSON logs appending a unique `traceId` onto trailing metadata.
+- **CI / Build Pipeline Cleanup:** Hardcoded bash cleanup commands were scrubbed from `package.json` and replaced with cross-platform equivalents (`rimraf`, `npm-run-all`). The `.github/workflows/ci.yml` was refactored for robust linting and type-checking. Note that the original private testing pipeline (`test.yml`) was explicitly removed as it attempted to pull inaccessible, private recruiters' GitHub actions.
+
 ### User Application
 
 #### Core Features
