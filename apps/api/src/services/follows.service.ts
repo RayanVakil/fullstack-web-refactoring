@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 import { createNotification } from "./notifications.service";
@@ -10,12 +11,12 @@ export async function toggleFollow(username: string, followerId: string) {
 	const userToFollow = await db.select().from(users).where(eq(users.username, username)).get();
 
 	if (!userToFollow) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	// Cannot follow yourself
 	if (userToFollow.id === followerId) {
-		throw new Error("You cannot follow yourself");
+		throw new AppError("INVALID_ARGUMENT", "You cannot follow yourself");
 	}
 
 	// Check if already following
@@ -52,7 +53,7 @@ export async function getFollowStatus(username: string, followerId: string) {
 	const userToCheck = await db.select().from(users).where(eq(users.username, username)).get();
 
 	if (!userToCheck) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	const follow = await db
@@ -68,7 +69,7 @@ export async function getFollowerCount(username: string) {
 	const user = await db.select().from(users).where(eq(users.username, username)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	const result = await db
@@ -84,7 +85,7 @@ export async function getFollowingCount(username: string) {
 	const user = await db.select().from(users).where(eq(users.username, username)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	const result = await db

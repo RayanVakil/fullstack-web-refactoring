@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { desc, eq, gte, like, or, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 import { generateId } from "./utils";
@@ -96,7 +97,7 @@ export async function getUserDetails(userId: string) {
 		.get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	return user;
@@ -106,11 +107,11 @@ export async function banUser(userId: string, reason: string, adminId: string) {
 	const user = await db.select().from(users).where(eq(users.id, userId)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	if (user.role === "admin") {
-		throw new Error("Cannot ban admin users");
+		throw new AppError("PERMISSION_DENIED", "Cannot ban admin users");
 	}
 
 	await db
@@ -132,7 +133,7 @@ export async function unbanUser(userId: string, adminId: string) {
 	const user = await db.select().from(users).where(eq(users.id, userId)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	await db
@@ -153,13 +154,13 @@ export async function unbanUser(userId: string, adminId: string) {
 export async function updateUserRole(userId: string, role: string, adminId: string) {
 	const validRoles = ["user", "admin", "moderator"];
 	if (!validRoles.includes(role)) {
-		throw new Error("Invalid role");
+		throw new AppError("INVALID_ARGUMENT", "Invalid role");
 	}
 
 	const user = await db.select().from(users).where(eq(users.id, userId)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	await db
@@ -180,11 +181,11 @@ export async function deleteUser(userId: string, adminId: string) {
 	const user = await db.select().from(users).where(eq(users.id, userId)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	if (user.role === "admin") {
-		throw new Error("Cannot delete admin users");
+		throw new AppError("PERMISSION_DENIED", "Cannot delete admin users");
 	}
 
 	await db.delete(users).where(eq(users.id, userId));
@@ -199,7 +200,7 @@ export async function deletePostAdmin(postId: string, reason: string, adminId: s
 	const post = await db.select().from(posts).where(eq(posts.id, postId)).get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	await db.delete(posts).where(eq(posts.id, postId));
@@ -214,7 +215,7 @@ export async function deleteCommentAdmin(commentId: string, reason: string, admi
 	const comment = await db.select().from(comments).where(eq(comments.id, commentId)).get();
 
 	if (!comment) {
-		throw new Error("Comment not found");
+		throw new AppError("NOT_FOUND", "Comment not found");
 	}
 
 	await db.delete(comments).where(eq(comments.id, commentId));
@@ -288,7 +289,7 @@ export async function getReport(reportId: string) {
 		.get();
 
 	if (!report) {
-		throw new Error("Report not found");
+		throw new AppError("NOT_FOUND", "Report not found");
 	}
 
 	return report;
@@ -303,7 +304,7 @@ export async function reviewReport(
 	const report = await db.select().from(reports).where(eq(reports.id, reportId)).get();
 
 	if (!report) {
-		throw new Error("Report not found");
+		throw new AppError("NOT_FOUND", "Report not found");
 	}
 
 	let status: "pending" | "reviewed" | "actioned" | "dismissed" = "reviewed";

@@ -48,6 +48,9 @@ export function withLogging<T extends Record<string, any>>(serviceName: string, 
 					return result;
 				} catch (error) {
 					const duration = Date.now() - startTime;
+					if (context && typeof context.responseTrailers === "object") {
+						context.responseTrailers.traceId = traceId;
+					}
 					console.error(
 						JSON.stringify({
 							traceId,

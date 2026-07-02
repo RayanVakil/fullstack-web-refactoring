@@ -51,11 +51,11 @@ export function buildPostSelect(currentUserId?: string) {
 
 export async function createPost(input: CreatePostInput) {
 	if (!input.content || input.content.length === 0) {
-		throw new Error("Post content is required");
+		throw new AppError("INVALID_ARGUMENT", "Post content is required");
 	}
 
 	if (input.content.length > 280) {
-		throw new Error("Post content must be 280 characters or less");
+		throw new AppError("INVALID_ARGUMENT", "Post content must be 280 characters or less");
 	}
 
 	const postId = generateId();
@@ -88,11 +88,11 @@ export async function getPost(postId: string, userId?: string) {
 
 export async function updatePost(input: UpdatePostInput) {
 	if (!input.content || input.content.length === 0) {
-		throw new Error("Post content is required");
+		throw new AppError("INVALID_ARGUMENT", "Post content is required");
 	}
 
 	if (input.content.length > 280) {
-		throw new Error("Post content must be 280 characters or less");
+		throw new AppError("INVALID_ARGUMENT", "Post content must be 280 characters or less");
 	}
 
 	const post = await db.select().from(posts).where(eq(posts.id, input.postId)).get();
@@ -102,14 +102,14 @@ export async function updatePost(input: UpdatePostInput) {
 	}
 
 	if (post.authorId !== input.userId) {
-		throw new Error("You can only edit your own posts");
+		throw new AppError("PERMISSION_DENIED", "You can only edit your own posts");
 	}
 
 	// Check edit window (5 minutes)
 	const now = Date.now();
 	const postTime = post.createdAt.getTime();
 	if (now - postTime > 300000) {
-		throw new Error("Edit window has expired (5 minutes)");
+		throw new AppError("INVALID_ARGUMENT", "Edit window has expired (5 minutes)");
 	}
 
 	await db
@@ -131,7 +131,7 @@ export async function deletePost(postId: string, userId: string) {
 	}
 
 	if (post.authorId !== userId) {
-		throw new Error("You can only delete your own posts");
+		throw new AppError("PERMISSION_DENIED", "You can only delete your own posts");
 	}
 
 	await db.delete(posts).where(eq(posts.id, postId));
@@ -156,7 +156,7 @@ export async function getUserPosts(username: string, userId?: string) {
 	const user = await db.select().from(users).where(eq(users.username, username)).get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	return await db

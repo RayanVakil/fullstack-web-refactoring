@@ -86,7 +86,7 @@ This document outlines the core system vulnerabilities and architectural defects
   | `comments.service.ts`| Yes | Nested resolutions verified. |
   | `bookmarks.service`| Partial | Needs robust testing for sort orders. |
   | `search.service.ts`| No | Missing unit tests for full-text search. |
-  | `users.service.ts` | No | Missing follow/unfollow unit tests. |
+  | `users.service.ts` | ❌ No | Missing `getUser`/`updateProfile` unit tests |
   | `feed.service.ts`  | Partial | Needs service-level feed sorting tests. |
   | E2E Auth / Feed    | Yes | Covered by Playwright tests. |
 

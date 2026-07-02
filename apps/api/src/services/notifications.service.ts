@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 import { generateId } from "./utils";
@@ -94,11 +95,11 @@ export async function markAsRead(notificationId: string, userId: string) {
 		.get();
 
 	if (!notification) {
-		throw new Error("Notification not found");
+		throw new AppError("NOT_FOUND", "Notification not found");
 	}
 
 	if (notification.userId !== userId) {
-		throw new Error("Unauthorized");
+		throw new AppError("UNAUTHENTICATED", "Unauthorized");
 	}
 
 	await db.update(notifications).set({ read: true }).where(eq(notifications.id, notificationId));
@@ -126,11 +127,11 @@ export async function deleteNotification(notificationId: string, userId: string)
 		.get();
 
 	if (!notification) {
-		throw new Error("Notification not found");
+		throw new AppError("NOT_FOUND", "Notification not found");
 	}
 
 	if (notification.userId !== userId) {
-		throw new Error("Unauthorized");
+		throw new AppError("UNAUTHENTICATED", "Unauthorized");
 	}
 
 	await db.delete(notifications).where(eq(notifications.id, notificationId));

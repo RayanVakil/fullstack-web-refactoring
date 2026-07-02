@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 
@@ -41,7 +42,7 @@ export async function getUser(username: string, requesterId?: string) {
 		.get();
 
 	if (!user) {
-		throw new Error("User not found");
+		throw new AppError("NOT_FOUND", "User not found");
 	}
 
 	return user;

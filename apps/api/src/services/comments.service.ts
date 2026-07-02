@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "../db";
 import { processMentions } from "./mentions.service";
@@ -38,14 +39,14 @@ export function buildCommentSelect(currentUserId?: string) {
 
 export async function createComment(input: CreateCommentInput) {
 	if (!input.content || input.content.length === 0) {
-		throw new Error("Comment content is required");
+		throw new AppError("INVALID_ARGUMENT", "Comment content is required");
 	}
 
 	// Verify post exists
 	const post = await db.select().from(posts).where(eq(posts.id, input.postId)).get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	// If parentId provided, verify parent comment exists
@@ -57,12 +58,12 @@ export async function createComment(input: CreateCommentInput) {
 			.get();
 
 		if (!parentComment) {
-			throw new Error("Parent comment not found");
+			throw new AppError("NOT_FOUND", "Parent comment not found");
 		}
 
 		// Only allow one level of nesting
 		if (parentComment.parentId) {
-			throw new Error("Cannot reply to a reply");
+			throw new AppError("INVALID_ARGUMENT", "Cannot reply to a reply");
 		}
 	}
 
@@ -125,11 +126,11 @@ export async function deleteComment(commentId: string, userId: string) {
 	const comment = await db.select().from(comments).where(eq(comments.id, commentId)).get();
 
 	if (!comment) {
-		throw new Error("Comment not found");
+		throw new AppError("NOT_FOUND", "Comment not found");
 	}
 
 	if (comment.authorId !== userId) {
-		throw new Error("You can only delete your own comments");
+		throw new AppError("PERMISSION_DENIED", "You can only delete your own comments");
 	}
 
 	await db.delete(comments).where(eq(comments.id, commentId));

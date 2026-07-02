@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { db, schema } from "../db";
 import { buildPostSelect } from "./posts.service";
@@ -13,7 +14,7 @@ export async function toggleBookmark(postId: string, userId: string) {
 	const post = await db.select().from(posts).where(eq(posts.id, postId)).get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	// Check if already bookmarked

@@ -1,3 +1,4 @@
+import { AppError } from "../grpc/interceptor";
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "../db";
 import { createNotification } from "./notifications.service";
@@ -10,7 +11,7 @@ export async function togglePostLike(postId: string, userId: string) {
 	const post = await db.select().from(posts).where(eq(posts.id, postId)).get();
 
 	if (!post) {
-		throw new Error("Post not found");
+		throw new AppError("NOT_FOUND", "Post not found");
 	}
 
 	// Check if already liked
@@ -49,7 +50,7 @@ export async function toggleCommentLike(commentId: string, userId: string) {
 	const comment = await db.select().from(comments).where(eq(comments.id, commentId)).get();
 
 	if (!comment) {
-		throw new Error("Comment not found");
+		throw new AppError("NOT_FOUND", "Comment not found");
 	}
 
 	// Check if already liked

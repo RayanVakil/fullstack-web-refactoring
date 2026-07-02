@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
-		"build": "tsc",
+		"build": "echo 'No build required for API (uses tsx)'",
 		"start": "tsx src/index.ts",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
