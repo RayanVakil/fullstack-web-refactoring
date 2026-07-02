@@ -82,7 +82,7 @@ export function FollowButton({ username }: { username: string }) {
 
 	useEffect(() => {
 		loadFollowStatus();
-	}, [loadFollowStatus]);
+	}, [username]);
 
 	const loadFollowStatus = async () => {
 		try {
@@ -129,17 +129,19 @@ export function FollowButton({ username }: { username: string }) {
 					<span>Loading...</span>
 				</>
 			) : following ? (
-				isHovered ? (
-					<>
-						<UserPlus {...stylex.props(styles.icon)} />
-						<span>Unfollow</span>
-					</>
-				) : (
-					<>
-						<UserCheck {...stylex.props(styles.icon)} />
-						<span>Following</span>
-					</>
-				)
+				<>
+					{isHovered ? (
+						<>
+							<UserPlus {...stylex.props(styles.icon)} />
+							<span>Unfollow</span>
+						</>
+					) : (
+						<>
+							<UserCheck {...stylex.props(styles.icon)} />
+							<span>Following</span>
+						</>
+					)}
+				</>
 			) : (
 				<>
 					<UserPlus {...stylex.props(styles.icon)} />

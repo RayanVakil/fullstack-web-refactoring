@@ -107,8 +107,8 @@ test.describe("Posts", () => {
 		await waitForHydration(page);
 
 		const newCount = await likeButton.textContent();
-		expect(Number.parseInt(newCount || "0", 10)).toBeGreaterThanOrEqual(
-			Number.parseInt(initialCount || "0", 10),
+		expect(Number.parseInt(newCount || "0")).toBeGreaterThanOrEqual(
+			Number.parseInt(initialCount || "0"),
 		);
 	});
 });

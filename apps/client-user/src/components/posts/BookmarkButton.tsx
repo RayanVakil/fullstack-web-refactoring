@@ -48,7 +48,7 @@ export function BookmarkButton({ postId, initialBookmarked = false }: BookmarkBu
 
 	useEffect(() => {
 		loadBookmarkStatus();
-	}, [loadBookmarkStatus]);
+	}, [postId]);
 
 	const loadBookmarkStatus = async () => {
 		try {

@@ -174,7 +174,7 @@ function UserProfilePage() {
 
 	useEffect(() => {
 		loadData();
-	}, [loadData]);
+	}, [username]);
 
 	const loadData = async () => {
 		try {

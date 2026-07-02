@@ -131,7 +131,7 @@ test.describe("User Profile - Comprehensive", () => {
 			// Get initial follower count
 			const followerText = page.getByText(/\d+\s*Followers/);
 			const initialText = await followerText.textContent();
-			const initialCount = Number.parseInt(initialText?.match(/\d+/)?.[0] || "0", 10);
+			const initialCount = Number.parseInt(initialText?.match(/\d+/)?.[0] || "0");
 
 			const followButton = page.locator("button").filter({ hasText: /^Follow$/ });
 
@@ -144,7 +144,7 @@ test.describe("User Profile - Comprehensive", () => {
 				await waitForHydration(page);
 
 				const newText = await page.getByText(/\d+\s*Followers/).textContent();
-				const newCount = Number.parseInt(newText?.match(/\d+/)?.[0] || "0", 10);
+				const newCount = Number.parseInt(newText?.match(/\d+/)?.[0] || "0");
 
 				expect(newCount).toBeGreaterThanOrEqual(initialCount);
 			}
@@ -213,11 +213,11 @@ test.describe("User Profile - Comprehensive", () => {
 			const postArticle = page.locator("article").filter({ hasText: content }).first();
 			const likeButton = postArticle.locator("button").filter({ hasText: /^\d+$/ }).first();
 
-			const initialCount = Number.parseInt((await likeButton.textContent()) || "0", 10);
+			const initialCount = Number.parseInt((await likeButton.textContent()) || "0");
 			await likeButton.click();
 			await waitForHydration(page);
 
-			const newCount = Number.parseInt((await likeButton.textContent()) || "0", 10);
+			const newCount = Number.parseInt((await likeButton.textContent()) || "0");
 			expect(newCount).toBeGreaterThanOrEqual(initialCount);
 		});
 	});
